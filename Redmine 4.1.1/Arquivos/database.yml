@@ -1,0 +1,8 @@
+production:
+  adapter: mysql2
+  database: redmine
+  host: localhost
+  username: redmine
+  password: "redmine_passwd"
+  # Use "utf8" instead of "utfmb4" for MySQL prior to 5.7.7
+  encoding: utf8mb4
