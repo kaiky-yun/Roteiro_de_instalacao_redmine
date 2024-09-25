@@ -1,0 +1,12 @@
+# Faça download do plugin desejado, descompacte-o e mova para a pasta plugins do diretório de instalação do redmine
+# Vá até o diretório de instalação do redmine e execute a instalação das dependências do Gemfile após a inserção do plugin
+cd /var/www/redmine-4.1
+bundle install
+
+# Execute a migração dos dados do plugin
+bundle exec rake redmine:plugins NAME=redmine_favorite_projects RAILS_ENV=production
+
+# Inicie o servidor e confira se a instalação foi concluida com sucesso
+bundle exec rails server -e production
+
+# Para o Favorite Project Plugin siga o passo a passo prensente no diretório "Favorite Project Plugin" deste repositório.
