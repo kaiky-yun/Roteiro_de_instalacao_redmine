@@ -1,88 +1,88 @@
-#Logue como usuário root
+# Logue como usuário root
 sudo su -
 
-#Execute os comandos abaixo para atualizar o sistema e instalar algumas dependências
+# Execute os comandos abaixo para atualizar o sistema e instalar algumas dependências
 sudo apt -y upgrade && sudo apt update && sudo apt install -y zlib1g-dev libcurl4-openssl-dev libssl-dev apache2-dev libapr1-dev libaprutil1-dev default-libmysqlclient-dev g++ libxml2-dev libxslt1-dev curl ftp imagemagick patch libreadline-dev libyaml-dev libffi-dev make bzip2 autoconf automake libtool bison subversion sqlite3 elinks git rbenv ruby-build rpm build-essential dpkg-dev
 
-#Desative os serviços de segurança/firewall
+# Desative os serviços de segurança/firewall
 sudo systemctl stop apparmor
 sudo systemctl disable apparmor
 
-#Instale e configure o banco de dados que será utilizado no Redmine
+# Instale e configure o banco de dados que será utilizado no Redmine
 sudo apt install -y mariadb-server libmariadb-dev
 sudo mysql_secure_installation
 
-#Realize o loguin no serviço mysql
+# Realize o loguin no serviço mysql
 mysql -u root -p
 
-#Execute os comandos abaixo para criar o usuário e banco de dados que serão utilizados
+# Execute os comandos abaixo para criar o usuário e banco de dados que serão utilizados
 create database redmine character set utf8;
 create user 'redmine'@'localhost' identified by 'redmine_passwd';
 grant all privileges on redmine.* to 'redmine'@'localhost';
 flush privileges;
 quit;
 
-#Realize a instalação das dependências para instalar o Ruby
+# Realize a instalação das dependências para instalar o Ruby
 curl -sSL https://rvm.io/mpapis.asc | gpg --import -
 curl -sSL https://rvm.io/pkuczynski.asc | gpg --import -
 curl -sSL https://get.rvm.io | bash -s stable
 source /etc/profile.d/rvm.sh
 rvm --version
 
-#Instale e configure o Ruby
+# Instale e configure o Ruby
 rvm install 2.5.8
 rvm use 2.5.8 --default
 ruby -v
 
-#Instale o passenger e algumas dependências
+# Instale o passenger e algumas dependências
 gem install passenger -v '6.0.10'
 sudo apt-get install shared-mime-info
 sudo apt-get install -y libcurl4-openssl-dev apache2-dev apache2 libapr1-dev libaprutil1-dev
 
-#Configure o passenger
+# Configure o passenger
 passenger-install-apache2-module
 
-#Crie o diretório onde será realizada a instalação do redmine
+# Crie o diretório onde será realizada a instalação do redmine
 sudo mkdir -p /var/www/redmine-4.1
 
-#Baixe o arquivo de instalação do redmine 4.1.1
+# Baixe o arquivo de instalação do redmine 4.1.1
 wget https://www.redmine.org/releases/redmine-4.1.1.tar.gz
 
-#Descompacte-o e mova para a pasta previamente criada
+# Descompacte-o e mova para a pasta previamente criada
 tar -xvzf redmine-4.1.1.tar.gz
 cd redmine-4.1.1/
 sudo mv * /var/www/redmine-4.1
 
-#Vá para a nova pasta do redmine
+# Vá para a nova pasta do redmine
 cd /var/www/redmine-4.1
 
-#Altere o arquivo Gemfile de acordo com o presente neste repositório
+# Altere o arquivo Gemfile de acordo com o presente neste repositório
 sudo nano Gemfile
 
-#Instale o bundler
+# Instale o bundler
 gem install bundler -v 2.3.27
 
-#Crie o database.yml de acordo com o arquivo presente neste repositório
+# Crie o database.yml de acordo com o arquivo presente neste repositório
 cd config
 sudo touch database.yml
 sudo nano database.yml
 
-#Use o configuration.yml.example como arquivo padrão
+# Use o configuration.yml.example como arquivo padrão
 sudo mv configuration.yml.example configuration.yml
 
-#Vá até o diretório do redmine e faça a instalação do redmine
+# Vá até o diretório do redmine e faça a instalação do redmine
 cd /var/www/redmine-4.1/
 bundle config set --local without 'development test postgresql sqlite'
 bundle install
 
-#Configure o apache para o redmine com o arquivo redmine.conf presente neste repositório
+# Configure o apache para o redmine com o arquivo redmine.conf presente neste repositório
 touch /etc/apache2/sites-available/redmine.conf
 nano /etc/apache2/sites-available/redmine.conf
 
-#Execute esses comandos para configurar e preparar o ambiente de produção para o Redmine.
+# Execute esses comandos para configurar e preparar o ambiente de produção para o Redmine.
 rake generate_secret_token
 RAILS_ENV=production rake db:migrate
 RAILS_ENV=production rake redmine:load_default_data
 
-#Inicie o Redmine.
+# Inicie o Redmine.
 bundle exec rails server -e production
