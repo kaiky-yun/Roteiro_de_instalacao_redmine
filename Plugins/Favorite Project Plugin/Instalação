@@ -1,0 +1,28 @@
+# Vá até o arquivo abaixo e altere-o com o arquivo application_helper_patch.rb disponibilizado neste repositório
+nano /var/www/redmine-4.1/plugins/redmine_favorite_projects/lib/redmine_favorite_projects/patches/application_helper_patch.rb
+
+# Execute a instalação das dependências do Gemfile
+bundle install
+
+# Instale manualmente a versão mais recente do redmine_crm
+gem install redmine_crm
+
+# Remova a versão anterior e deixe apenas a mais recente
+gem uninstall redmine_crm
+
+# Altere a linha redmine_crm (0.0.23) para redmine_crm (0.0.63) no arquivo abaixo
+Gemfile.lock
+
+# Execute novamente a instalação das dependências do Gemfile
+bundle install
+
+# Renomeie o plugin redmine_cms para redmineup_cms
+mv plugins/redmine_cms plugins/redmineup_cms
+
+# Execute a migração dos dados do plugin
+bundle exec rake redmine:plugins NAME=redmine_favorite_projects RAILS_ENV=production
+
+# Reinicie o apache e inicie o redmine
+cd /var/www/redmin-4.1/
+systemctl restart apache2
+bundle exec rails server -e production
