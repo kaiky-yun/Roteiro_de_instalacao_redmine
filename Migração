@@ -1,7 +1,10 @@
+# 
 # Para realizar a migração basta fazer o backup na instância de origem e o restore na instância de destino
 
+# 
 # Comando para Backup
 /usr/bin/mysqldump -u root -p -h localhost redmine > /home/redmine/redmine.sql
 
+# 
 # Comando para Restore
 mysql -u redmine -p redmine < /home/debian/redmine.sql
